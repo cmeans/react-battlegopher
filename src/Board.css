@@ -1,4 +1,5 @@
 .Board {
+    cursor: pointer;
     position: relative;
     margin: 0 auto;
     background-color: #000;
@@ -12,15 +13,24 @@
              transparent 1px);
 }
 
+.Board.NotYourTurn {
+    cursor: not-allowed;
+}
+
 .Cell {
-    background: #ccc;
     position: absolute;
 }
 
 .Cell.Unknown {
-    background: #f00;
+    background: #ccc;
 }
 
-.Cell .hit {
+.Cell.Hit {
+    background: #f00;
+    cursor: not-allowed;
+}
+
+.Cell.Miss {
     background: #0f0;
+    cursor: not-allowed;
 }

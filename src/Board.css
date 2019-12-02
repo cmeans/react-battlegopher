@@ -11,11 +11,16 @@
             90deg,
             #333 1px,
              transparent 1px);
+    border: 5px solid white;
 }
 
-.Board.NotYourTurn {
-    cursor: not-allowed;
+.Board.ActivePlayer {
+    border: 5px solid blue;
 }
+
+/* .Board.NotYourTurn {
+    cursor: not-allowed;
+} */
 
 .Cell {
     position: absolute;

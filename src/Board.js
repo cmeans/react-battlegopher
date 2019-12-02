@@ -1,10 +1,9 @@
 import React from 'react';
-import { Box, Grid } from '@material-ui/core';
+import { Box, Chip, Grid } from '@material-ui/core';
 import Service from './Service';
 import GameContext from './GameContext';
 import './Board.css';
 
-//const CELL_SIZE = 100;
 const WIDTH = 400;
 const HEIGHT = 400;
 
@@ -43,9 +42,6 @@ class Board extends React.Component
   }
 
   componentDidMount() {
-    // const rect = this.boardRef.getBoundingClientRect();
-    // console.log(rect)
-
     this.setState({
       sessionId: this.context.sessionId
     });
@@ -100,7 +96,7 @@ class Board extends React.Component
     const y = Math.floor(offsetY / this.cellSize);
 
     if (x >= 0 && x <= this.cols && y >= 0 && y <= this.rows) {
-      // Should only let user click "unknown" cells.
+      // Should only let user click "Unknown" cells.
       if (this.board[y][x] === 'Unknown') {
         // Send this move.
         this.service.guess(
@@ -109,15 +105,17 @@ class Board extends React.Component
           y,
           x)
           .then(res => {
-            if (res.notYourTurn === true) {
+            if (res.notYourTurn) {
               alert('It is not your turn!');
             } else {
               // Record the hit or miss.
               this.board[y][x] = res.hit ? 'Hit' : 'Miss';
 
+              // Update the board.
               this.setState({ cells: this.makeCells() });
 
               if (res.gameOver) {
+                // We have a winner with that last move.
                 this.context.gameOver();
               }
             }
@@ -128,39 +126,44 @@ class Board extends React.Component
 
   render()
   {
-    const { cells } = this.state;
+    const { cells, playerName } = this.state;
+
+    const activeChipColor = (playerName === this.props.activePlayerName) ? "primary" : "secondary";
+    const activeBoard = (playerName === this.props.activePlayerName) ? "ActivePlayer" : "";
 
     return (
       <Box>
-      <Grid container direction="column" alignItems="center">
-        <Grid item xs={12}>
-          <h3>
-            {this.state.playerName}'s Board
-          </h3>
+        <Grid container direction="column" alignItems="center" spacing={2}>
+          <Grid item xs={12}>
+            <Chip
+              size="medium"
+              color={activeChipColor}
+              label={playerName}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <div
+            className={ `Board ${activeBoard}` }
+            style={{ width: WIDTH, height: HEIGHT, backgroundSize: `${this.cellSize}px ${this.cellSize}px`}}
+            onClick={this.handleClick}
+            ref={(n) => {
+              this.boardRef = n;
+            }}
+          >
+            {
+              cells.map(cell => (
+                <Cell
+                  cellSize={this.cellSize}
+                  status={cell.status}
+                  x={cell.x}
+                  y={cell.y}
+                  key={`${cell.x},${cell.y}`}
+                />
+              ))
+            }
+            </div>
+          </Grid>
         </Grid>
-        <Grid item xs={12}>
-          <div
-          className="Board"
-          style={{ width: WIDTH, height: HEIGHT, backgroundSize: `${this.cellSize}px ${this.cellSize}px`}}
-          onClick={this.handleClick}
-          ref={(n) => {
-            this.boardRef = n;
-          }}
-        >
-          {
-            cells.map(cell => (
-              <Cell
-                cellSize={this.cellSize}
-                status={cell.status}
-                x={cell.x}
-                y={cell.y}
-                key={`${cell.x},${cell.y}`}
-              />
-            ))
-          }
-          </div>
-        </Grid>
-      </Grid>
       </Box>
     );
   }

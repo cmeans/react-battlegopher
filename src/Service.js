@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export default class Service {
   static _instance = null;
-  host = 'http://localhost:8080';
+  host = `${process.env.REACT_APP_SERVER_PROTOCOL}://${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT}`;
 
   static getInstance() {
     if (Service._instance == null) {
@@ -70,17 +70,21 @@ export default class Service {
 
   // Start a new game.
   async newGame(player1Name, player2Name, dimension) {
-    console.log(`Dimension: ${dimension}`);
+    try {
+      const res = await axios.post(
+        `${this.host}/newgame`,
+        {
+          board_dimension: parseInt(dimension),
+          player_names: [player1Name, player2Name]
+        });
 
-    const res = await axios.post(
-      `${this.host}/newgame`,
-      {
-        board_dimension: parseInt(dimension),
-        player_names: [player1Name, player2Name]
-      });
+      let data = await res.data;
 
-    let data = await res.data;
-
-    return data.session_id;
+      return data.session_id;
+    }
+    catch (err) {
+      console.log(err);
+      alert(err);
+    }
   }
 }

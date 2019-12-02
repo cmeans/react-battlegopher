@@ -1,6 +1,8 @@
 import React from 'react';
 import Service from './Service';
-import { Grid, Button, TextField } from '@material-ui/core';
+import { Grid, Button, InputAdornment, TextField, MenuItem } from '@material-ui/core';
+import PersonIcon from '@material-ui/icons/Person';
+import GridOnIcon from '@material-ui/icons/GridOn';
 import GameContext from './GameContext';
 
 class Start extends React.Component {
@@ -9,7 +11,7 @@ class Start extends React.Component {
   state = {
     player1Name: '',
     player2Name: '',
-    dimension: -1
+    dimension: ''
   };
 
   constructor(props) {
@@ -67,11 +69,17 @@ class Start extends React.Component {
   render() {
     return (
       <Grid container spacing={2} direction="column" alignItems="center">
-        <Grid item xs={4}>
+        <Grid item xs={3}>
           <TextField
             label="Player #1 Name"
             value={this.state.player1Name}
             onChange={this.handlePlayer1Change}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PersonIcon />
+                </InputAdornment>
+              )}}
           />
         </Grid>
         <Grid item xs={4}>
@@ -79,18 +87,39 @@ class Start extends React.Component {
             label="Player #2 Name"
             value={this.state.player2Name}
             onChange={this.handlePlayer2Change}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PersonIcon />
+                </InputAdornment>
+              )}}
           />
         </Grid>
         <Grid item xs={4}>
           <TextField
-              label="Board Dimension"
-              value={this.state.dimension}
-              onChange={this.handleDimensionChange}
-            />
+            select
+            label="Board Dimension"
+            value={this.state.dimension}
+            onChange={this.handleDimensionChange}
+            helperText="Please select the board size"
+            style={{width: 198}}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <GridOnIcon />
+                </InputAdornment>
+              )}}
+          >
+            {
+              [...Array(20)].map((_, value) => (
+                <MenuItem key={value + 1} value={value + 1}>{value + 1} x {value + 1}</MenuItem>
+              ))
+            }
+          </TextField>
         </Grid>
         <Grid item xs={4}>
           <Button onClick={this.handleClick}>
-            Start
+            Start Game
           </Button>
         </Grid>
       </Grid>

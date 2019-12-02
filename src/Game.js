@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Button } from '@material-ui/core';
+import { Button, Grid } from '@material-ui/core';
 import Board from './Board';
 import Start from './Start';
 import Service from './Service';
@@ -17,7 +17,7 @@ class Game extends React.Component {
   state = {
     player1Name: 'Gary',
     player2Name: 'Christine',
-    dimension: 11,
+    dimension: '11',
     // Values less than zero indicate no active game/session.
     sessionId: -1,
     activePlayerName: '',
@@ -36,7 +36,7 @@ class Game extends React.Component {
     this.handleSessionIdChange = this.handleSessionIdChange.bind(this);
     this.handleGameOver = this.handleGameOver.bind(this);
 
-    this.handleRestartClick = this.handleRestartClick.bind(this);
+    this.handleNewGameClick = this.handleNewGameClick.bind(this);
   }
 
   handlePlayer1NameChange(name) {
@@ -52,10 +52,10 @@ class Game extends React.Component {
   }
 
   handleSessionIdChange(value) {
-    this.setState({ sessionId: value });
-    if (value > -1) {
-      this.setState({ gameMode: GameMode.Active });
-    }
+    this.setState({
+      sessionId: value,
+      gameMode: (value === -1) ? GameMode.Initialize : GameMode.Active
+     });
   }
 
   handleGameOver() {
@@ -65,10 +65,8 @@ class Game extends React.Component {
     });
   }
 
-  handleRestartClick() {
-    this.setState({
-      sessionId: -1,
-      gameMode: GameMode.Initialize })
+  handleNewGameClick() {
+    this.handleSessionIdChange(-1);
   }
 
   isGameActive() {
@@ -85,7 +83,7 @@ class Game extends React.Component {
         this.service.turn(
           this.state.sessionId)
           .then(playerId => {
-            console.log(`Player Id: ${playerId} turn`);
+            // console.log(`Player Id: ${playerId} turn`);
             this.setState({ activePlayerName: playerId === 0 ? this.state.player1Name : this.state.player2Name })
           })
           .catch(err => {
@@ -93,64 +91,98 @@ class Game extends React.Component {
             this.setState({ lostNetwork: true });
           })
       },
-      2000);
+      500);
     }
 
     return isGameActive;
   }
 
   render() {
+    const { gameMode, player1Name, player2Name, dimension, activePlayerName, sessionId } = this.state;
+
     let content = null;
+    let status = null;
 
     this.isGameActive();
 
-    switch (this.state.gameMode) {
-      case GameMode.Initialize:
-        content =
-          <Start>
-          </Start>;
-        break;
-      default:
-        content =
-          <div>
-            <Grid container justify="center">
+    if (gameMode === GameMode.Initialize)
+      content =
+        <Start>
+        </Start>;
+    else {
+      if (gameMode === GameMode.Active) {
+        status =
+          <h4>
+            It's {activePlayerName}'s turn.
+          </h4>
+      } else {
+        status =
+          <h1>
+            {activePlayerName} is the Winner!
+          </h1>
+      }
+
+      content =
+        <div>
+          <Grid container justify="center">
+            <Grid container direction="column" alignContent="center">
               <Grid item xs={2}>
-                <Button onClick={this.handleRestartClick}>
-                  Restart
+                <h5>
+                  <div>
+                    {player1Name} vs {player2Name}
+                  </div>
+                  <div>
+                    Board size: {dimension} x {dimension}
+                  </div>
+                </h5>
+              </Grid>
+              <Grid item xs={2}>
+                <Button onClick={this.handleNewGameClick}>
+                  Start New Game
                 </Button>
               </Grid>
             </Grid>
-            <Grid container direction="row" spacing={4} justify="center">
-              <Grid item>
-                <Board
-                  playerId={0}
-                  playerName={this.state.player1Name}
-                  dimension={this.state.dimension}
-                >
-                </Board>
-                </Grid>
-              <Grid item>
-                <Board
-                  playerId={1}
-                  playerName={this.state.player2Name}
-                  dimension={this.state.dimension}
-                >
-                </Board>
-              </Grid>
-              <Grid item m={10} xs={12}>
-                It's player: {this.state.activePlayerName}'s turn.
-              </Grid>
+          </Grid>
+          <Grid container direction="row" spacing={4} justify="center">
+            <Grid item>
+              <Board
+                playerId={0}
+                playerName={player1Name}
+                dimension={dimension}
+                activePlayerName={activePlayerName}
+              >
+              </Board>
             </Grid>
-          </div>;
+            <Grid item>
+              <Board
+                playerId={1}
+                playerName={player2Name}
+                dimension={dimension}
+                activePlayerName={activePlayerName}
+              >
+              </Board>
+            </Grid>
+            <Grid item m={10} xs={12}>
+              { status }
+            </Grid>
+            {/* <Snackbar
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'center',
+              }}
+              message={status} //{<span id="message-id">{ status }</span>}
+            /> */}
+          </Grid>
+        </div>;
     }
 
     return (
       <GameContext.Provider
         value={{
-          player1Name: this.state.player1Name,
-          player2Name: this.state.player2Name,
-          dimension: this.state.dimension,
-          sessionId: this.state.sessionId,
+          player1Name: player1Name,
+          player2Name: player2Name,
+          dimension: dimension,
+          sessionId: sessionId,
           setPlayer1Name: this.handlePlayer1NameChange,
           setPlayer2Name: this.handlePlayer2NameChange,
           setDimension: this.handleDimensionChange,

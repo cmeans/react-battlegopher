@@ -51,7 +51,7 @@ class Start extends React.Component {
       this.state.player2Name,
       this.state.dimension)
       .then(sessionId => {
-        if (sessionId > 0) {
+        if (sessionId > -1) {
           // We have a valid sessionId, save the user input.
           this.context.setPlayer1Name(this.state.player1Name);
           this.context.setPlayer2Name(this.state.player2Name);

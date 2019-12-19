@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Grid } from '@material-ui/core';
+import { Box, Button, Grid } from '@material-ui/core';
 import Board from './Board';
 import Start from './Start';
 import Service from './Service';
@@ -177,21 +177,34 @@ class Game extends React.Component {
     }
 
     return (
-      <GameContext.Provider
-        value={{
-          player1Name: player1Name,
-          player2Name: player2Name,
-          dimension: dimension,
-          sessionId: sessionId,
-          setPlayer1Name: this.handlePlayer1NameChange,
-          setPlayer2Name: this.handlePlayer2NameChange,
-          setDimension: this.handleDimensionChange,
-          setSessionId: this.handleSessionIdChange,
-          gameOver: this.handleGameOver
-        }}
-      >
-        { content }
-      </GameContext.Provider>
+      <Box>
+        <Grid container justify="center" alignItems="center">
+          <Grid item>
+            <img src='/BattleGopher.png' alt='Battle Gopher' height="60px"/>
+          </Grid>
+          <Grid item>
+            <h1>Battle Gopher</h1>
+          </Grid>
+          <Grid item>
+            <img src='/BattleGopher.png' alt='Battle Gopher' height="60px"/>
+          </Grid>
+        </Grid>
+        <GameContext.Provider
+          value={{
+            player1Name: player1Name,
+            player2Name: player2Name,
+            dimension: dimension,
+            sessionId: sessionId,
+            setPlayer1Name: this.handlePlayer1NameChange,
+            setPlayer2Name: this.handlePlayer2NameChange,
+            setDimension: this.handleDimensionChange,
+            setSessionId: this.handleSessionIdChange,
+            gameOver: this.handleGameOver
+          }}
+        >
+          { content }
+        </GameContext.Provider>
+      </Box>
     );
   }
 }
